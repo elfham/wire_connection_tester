@@ -33,7 +33,9 @@ end
 class EasyI2CResetter
   DEFAULT_DEVICE = "/dev/i2c-1"
   DEFAULT_ADDRESS = 0x0f
-  DEFAULT_WAIT = 0.001  # XXX
+  DEFAULT_WAIT = 0.01 # 0.001  # XXX
+  RESET_ADDRESS = 0x00
+  VALID_FLAG_ADDRESSES = 0x01..0x02
 
   def initialize(address, option={})
     @address = address
@@ -43,17 +45,21 @@ class EasyI2CResetter
   end
 
   def reset
-    @i2c.write(@address, 0x00)
+    @i2c.write(@address, RESET_ADDRESS)
     sleep @wait
   end
 
+  def valid_address?(address)
+    VALID_FLAG_ADDRESSES.include? address
+  end
+
   def set_flag(address, value)
-    raise ArgumentError, "Invalid address" if address < 1 || address > 2
+    raise ArgumentError, "Invalid address" unless valid_address?(address)
     @i2c.write(@address, address, value)
   end
 
   def get_flag(address)
-    raise ArgumentError, "Invalid address" if address < 1 || address > 2
+    raise ArgumentError, "Invalid address" unless valid_address?(address)
     @i2c.read(@address, 1, address).unpack("c").first
   end
 
