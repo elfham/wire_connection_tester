@@ -3,14 +3,27 @@
 #include <Wire.h>
 
 #define MY_I2C_ADDRESS 0x0f
+
+#if 0
+#elif 0  // ATtiny85
 #define PIN_RESET 1
 #define PIN_BUTTON_1 4
 #define PIN_BUTTON_2 3
+#elif 1  // ATtiny202
+#define PIN_RESET 4
+#define PIN_BUTTON_1 0
+#define PIN_BUTTON_2 1
+#endif
 
 volatile byte flag_position;
-volatile byte flags[] = {0, 0, 0};
+volatile byte flags[] = {
+  0,  // RESET
+  0,  // BUTTON_1
+  0   // BUTTON_2
+};
 const uint8_t flags_size = sizeof(flags) / sizeof(byte);
 
+// for debug
 void _blinking() {
   for (int i = 0; i < 3; i++) {
     digitalWrite(PIN_RESET, LOW);
